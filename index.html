@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="xhTiPOwRBM4kzbiWawDJ7_78M3YTRZyzLzld96Ukcs4" />
+    
+    <title>GravitonX Labs | Engineering the Future</title>
+    
+    <!-- SEO METADATA -->
+    <meta name="description" content="GravitonX Labs - Building high-performance productivity tools like FocusGuard Pro. Python, PySide6, and modern glassmorphism UI.">
+    <meta name="keywords" content="FocusGuard, FocusGuard Pro, GravitonX, Windows Productivity, App Blocker, Pomodoro Timer, Python, PySide6, Glass UI">
+    <meta name="author" content="Mustafijur Rahman Ratul">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gravitonx-labs.github.io/">
+    <meta property="og:title" content="GravitonX - FocusGuard Pro">
+    <meta property="og:description" content="Regain focus with the ultimate distraction shield for Windows.">
+    <meta property="og:image" content="dashboard.png">
+    
+    <link rel="icon" type="image/png" href="gravitonx.png">
+    
+    <!-- FONTS & ICONS -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ANIMATIONS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #5D5FEF;
+            --secondary: #A5A6F6;
+            --accent: #00F0FF;
+            --bg-dark: #050507;
+            --glass-bg: rgba(20, 20, 25, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --nav-glass: rgba(5, 5, 7, 0.8);
+        }
+
+        html { scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- GLOBAL BACKGROUND (NEURAL) --- */
+        #neural-canvas { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: -1; /* Behind everything */
+            background: radial-gradient(circle at center, #12121a 0%, #000000 100%); 
+        }
+
+        /* --- CURSOR FX --- */
+        .cursor-dot, .cursor-outline {
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+            border-radius: 50%; z-index: 9999; pointer-events: none;
+        }
+        .cursor-dot { width: 8px; height: 8px; background: var(--accent); }
+        .cursor-outline {
+            width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+
+        /* --- NAVBAR --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; position: fixed; width: 100%; top: 0; z-index: 100;
+            backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border);
+            background: var(--nav-glass);
+        }
+        .logo { 
+            font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 12px; letter-spacing: 0.5px; color: white;
+        }
+        
+        /* LOGO FIX: CONTAIN & SIZE */
+        .logo img { 
+            height: 40px; width: 40px; object-fit: contain; 
+            border-radius: 8px; 
+            filter: drop-shadow(0 0 10px rgba(93, 95, 239, 0.4)); 
+            transition: transform 0.4s; 
+        }
+        .logo:hover img { transform: scale(1.1); }
+
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links a { color: #aaa; text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: 0.3s; }
+        .nav-links a:hover { color: white; color: var(--primary); }
+        
+        .github-btn {
+            padding: 8px 20px; border: 1px solid var(--glass-border); border-radius: 20px;
+            color: white; text-decoration: none; font-size: 0.9rem; transition: 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .github-btn:hover { background: rgba(255,255,255,0.1); border-color: white; }
+
+        /* --- MAIN HUB HERO --- */
+        .hub-hero {
+            min-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 0 5%;
+        }
+        
+        h1 {
+            font-size: 5rem; line-height: 1.1; font-weight: 900; margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 30%, #5D5FEF 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .typing-wrapper {
+            font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; color: var(--accent);
+            margin-bottom: 40px; height: 30px; display: flex; align-items: center; justify-content: center;
+        }
+        .typing-cursor { display: inline-block; width: 2px; height: 1.2rem; background: var(--accent); margin-left: 5px; animation: blink 1s infinite; }
+
+        /* --- ABOUT SECTION --- */
+        .about-section { padding: 80px 10%; position: relative; }
+        .about-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px; align-items: center; }
+        .about-text h2 { font-size: 3rem; margin-bottom: 20px; }
+        .about-text p { color: #bbb; line-height: 1.8; margin-bottom: 20px; font-size: 1.1rem; }
+        
+        .stat-box { display: flex; gap: 40px; margin-top: 30px; }
+        .stat h3 { font-size: 2.5rem; color: var(--primary); margin-bottom: 5px; }
+        .stat p { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- PRODUCT GRID --- */
+        .products-section { padding: 100px 5%; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-size: 3rem; margin-bottom: 10px; }
+        .section-header p { color: #aaa; }
+
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+
+        .product-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            padding: 40px; border-radius: 24px; position: relative; overflow: hidden;
+            transition: 0.4s; display: flex; flex-direction: column; height: 100%;
+            transform-style: preserve-3d; transform: perspective(1000px);
+            cursor: pointer;
+        }
+        .product-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 20px 60px -10px rgba(93,95,239,0.2); }
+
+        .badge { position: absolute; top: 20px; right: 20px; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .live { border: 1px solid #00D26A; color: #00D26A; background: rgba(0,210,106,0.1); }
+        .dev { border: 1px solid #FFBC2E; color: #FFBC2E; background: rgba(255,188,46,0.1); }
+
+        /* PRODUCT ICON FIX */
+        .p-icon-img { height: 70px; width: 70px; object-fit: contain; margin-bottom: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .p-icon-font { font-size: 3rem; color: var(--secondary); margin-bottom: 25px; display: block; }
+
+        .product-card h3 { font-size: 1.8rem; margin-bottom: 10px; }
+        .product-card p { color: #aaa; font-size: 1rem; line-height: 1.6; flex-grow: 1; margin-bottom: 30px; }
+
+        .btn-action {
+            padding: 15px; border-radius: 12px; text-align: center; font-weight: 700;
+            background: var(--primary); color: white; text-decoration: none; box-shadow: 0 5px 15px rgba(93,95,239,0.3);
+            transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-action:hover { transform: scale(1.02); background: #4b4dcf; }
+        .btn-disabled { background: rgba(255,255,255,0.05); color: #555; cursor: not-allowed; box-shadow: none; }
+
+        /* --- FOOTER --- */
+        footer { padding: 80px 10%; border-top: 1px solid var(--glass-border); text-align: center; color: #666; margin-top: 50px;}
+
+        /* ========================================= */
+        /* === FOCUSGUARD IMMERSIVE MODAL === */
+        /* ========================================= */
+        #fg-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            /* TRANSPARENT BACKGROUND SO NEURAL NET SHOWS THROUGH */
+            background: rgba(5, 5, 7, 0.85); 
+            backdrop-filter: blur(25px); /* Heavy Blur for readability */
+            z-index: 2000; overflow-y: auto; overflow-x: hidden;
+            transform: translateY(100%); transition: transform 0.6s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+        #fg-modal.active { transform: translateY(0%); }
+
+        .modal-nav {
+            position: fixed; width: 100%; padding: 20px 5%; z-index: 2001;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(5,5,7,0.6); backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border);
+        }
+        .close-btn {
+            background: rgba(255,255,255,0.1); border: none; color: white; padding: 10px 25px;
+            border-radius: 30px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; transition:0.3s;
+        }
+        .close-btn:hover { background: #FF0055; box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+
+        /* FG HERO */
+        .fg-hero { display: flex; align-items: center; padding: 160px 10% 80px 10%; gap: 60px; justify-content: space-between; }
+        .fg-text { width: 50%; }
+        .fg-visual { width: 45%; perspective: 1000px; }
+        .fg-img { width: 100%; border-radius: 20px; box-shadow: 0 30px 80px rgba(93,95,239,0.25); border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* FG TYPING */
+        .fg-typing {
+            font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: var(--accent);
+            margin-bottom: 20px; height: 30px; display: flex; align-items: center;
+        }
+
+        /* GLOWING DOWNLOAD BUTTON */
+        .glow-btn {
+            display: inline-flex; align-items: center; gap: 12px; padding: 18px 45px;
+            background: linear-gradient(45deg, var(--primary), #8A2BE2);
+            color: white; text-decoration: none; border-radius: 50px; font-weight: 800; font-size: 1.1rem;
+            position: relative; overflow: hidden; transition: 0.3s;
+            box-shadow: 0 0 30px rgba(93, 95, 239, 0.5);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .glow-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            transition: 0.5s;
+        }
+        .glow-btn:hover { transform: scale(1.05); box-shadow: 0 0 60px var(--primary), 0 0 10px #fff; }
+        .glow-btn:hover::before { left: 100%; }
+
+        /* SONIC SECTION (FG ONLY) */
+        .sonic-section { padding: 50px 10%; }
+        .sonic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-top: 30px; }
+        .sound-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 20px; border-radius: 16px;
+            display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.3s;
+        }
+        .sound-card:hover { background: rgba(93,95,239,0.15); border-color: var(--primary); transform: translateY(-5px); }
+        .play-icon { width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        
+        .visualizer { display: flex; gap: 3px; height: 20px; margin-left: auto; align-items: flex-end; opacity: 0.5; }
+        .bar { width: 3px; background: var(--accent); border-radius: 2px; height: 20%; }
+        .sound-card.playing .bar { animation: dance 0.4s infinite alternate; }
+        .sound-card.playing .bar:nth-child(odd) { animation-delay: 0.1s; }
+        @keyframes dance { 100% { height: 100%; filter: drop-shadow(0 0 5px var(--accent)); } }
+
+        /* FEATURE CARDS (FG ONLY) */
+        .feature-grid-fg { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 50px 10%; }
+        .feature-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 35px; border-radius: 20px;
+            transition: 0.3s;
+        }
+        .feature-card:hover { background: rgba(255,255,255,0.05); border-color: var(--secondary); transform: translateY(-5px); }
+        .feature-card i { font-size: 2.5rem; color: var(--secondary); margin-bottom: 20px; display: block; }
+        .feature-card h3 { margin-bottom: 10px; font-size: 1.4rem; }
+        .feature-card p { color: #aaa; line-height: 1.6; }
+
+        /* MOBILE FIXES */
+        @media(max-width: 900px) {
+            h1 { font-size: 3rem; }
+            .nav-links { display: none; }
+            .hub-hero { padding-top: 120px; min-height: 60vh; }
+            .fg-hero, .about-grid { flex-direction: column; text-align: center; }
+            .fg-hero { padding-top: 120px; }
+            .fg-text, .fg-visual { width: 100%; }
+            .fg-visual { margin-top: 50px; }
+            .product-grid, .feature-grid-fg, .sonic-grid { grid-template-columns: 1fr; }
+            
+            /* Disable Cursor on Mobile */
+            * { cursor: auto !important; } .cursor-dot, .cursor-outline { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MOUSE FX -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    
+    <!-- GLOBAL BACKGROUND (Visible everywhere) -->
+    <canvas id="neural-canvas"></canvas>
+
+    <!-- === MAIN HUB === -->
+    <div id="main-hub">
+        
+        <nav>
+            <div class="logo"><img src="gravitonx.png" alt="GX"> GravitonX Labs</div>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#products">Software</a>
+                <a href="#tech">PrismCore</a>
+            </div>
+            <a href="https://github.com/MustafijRatul" target="_blank" class="github-btn"><i class="fa-brands fa-github"></i> GitHub</a>
+        </nav>
+
+        <!-- HERO -->
+        <section class="hub-hero">
+            <div data-aos="fade-up">
+                <h1>Engineering the<br>Impossible.</h1>
+                <div class="typing-wrapper"><span id="main-typewriter"></span><span class="typing-cursor"></span></div>
+            </div>
+        </section>
+
+        <!-- ABOUT -->
+        <section id="about" class="about-section">
+            <div class="about-grid">
+                <div class="about-text" data-aos="fade-right">
+                    <h2>We Build Flow.</h2>
+                    <p>GravitonX Labs is a specialized research facility focused on <b>high-performance desktop utilities</b>. We believe Windows applications shouldn't just be functional—they should be immersive.</p>
+                    <div class="stat-box">
+                        <div class="stat"><h3>11.8</h3><p>Version</p></div>
+                        <div class="stat"><h3>100%</h3><p>Python</p></div>
+                        <div class="stat"><h3>0ms</h3><p>Lag</p></div>
+                    </div>
+                </div>
+                <!-- Abstract visual placeholder -->
+                <div style="opacity:0.1; text-align:center;" data-aos="zoom-in">
+                    <i class="fa-solid fa-microchip" style="font-size:12rem;"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRODUCTS -->
+        <section id="products" class="products-section">
+            <div class="section-header">
+                <h2>Product Ecosystem</h2>
+                <p>Select a product to view details.</p>
+            </div>
+            
+            <div class="product-grid">
+                <!-- FOCUSGUARD PRO -->
+                <div class="product-card" onclick="openFocusGuard()" data-tilt data-tilt-max="5" data-aos="fade-up">
+                    <div class="badge live">Live</div>
+                    <img src="appicon.png" class="p-icon-img" alt="FocusGuard">
+                    <h3>FocusGuard Pro</h3>
+                    <p>The flagship distraction shield. Strict blocking, Pomodoro timers, and analytics in a glass UI.</p>
+                    <div class="btn-action">View & Download <i class="fa-solid fa-arrow-right"></i></div>
+                </div>
+
+                <!-- AETHER LAB -->
+                <div class="product-card" data-tilt data-tilt-max="5" data-aos="fade-up" data-aos-delay="100">
+                    <div class="badge dev">Dev</div>
+                    <i class="fa-solid fa-flask p-icon-font"></i>
+                    <h3>Aether Lab</h3>
+                    <p>Next-gen scientific computing. Real-time numerical method visualization and 3D plotting.</p>
+                    <div class="btn-action btn-disabled">Coming Soon</div>
+                </div>
+
+                <!-- HOLOSPACE -->
+                <div class="product-card" data-tilt data-tilt-max="5" data-aos="fade-up" data-aos-delay="200">
+                    <div class="badge dev">Concept</div>
+                    <i class="fa-solid fa-rocket p-icon-font"></i>
+                    <h3>HoloSpace</h3>
+                    <p>Physics-based desktop. Turn icons into floating gravity orbs with the Verlet-X engine.</p>
+                    <div class="btn-action btn-disabled">Coming Soon</div>
+                </div>
+
+                <!-- GHOSTFLOW -->
+                <div class="product-card" data-tilt data-tilt-max="5" data-aos="fade-up" data-aos-delay="300">
+                    <div class="badge dev">Concept</div>
+                    <i class="fa-solid fa-ghost p-icon-font"></i>
+                    <h3>GhostFlow</h3>
+                    <p>Human-like automation. Record and replay complex tasks using Bezier curves.</p>
+                    <div class="btn-action btn-disabled">Coming Soon</div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2025 <b>GravitonX Labs</b>. Architected by Mustafijur Rahman Ratul.</p>
+        </footer>
+    </div>
+
+    <!-- === FOCUSGUARD PRO MODAL === -->
+    <div id="fg-modal">
+        <div class="modal-nav">
+            <div class="logo"><img src="appicon.png"> FocusGuard Pro</div>
+            <button class="close-btn" onclick="closeFocusGuard()">Close <i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <section class="fg-hero">
+            <div class="fg-text">
+                <h1 style="font-size:3.5rem;">Defy Gravity.<br>Regain Focus.</h1>
+                
+                <div class="fg-typing">
+                    <span id="fg-typewriter"></span><span class="typing-cursor"></span>
+                </div>
+                
+                <p style="color:#ccc; font-size:1.1rem; line-height:1.6; margin-bottom: 30px;">
+                    Stop fighting distractions—eliminate them. FocusGuard Pro uses the <b>Verlet-X</b> logic engine to strictly enforce your work sessions.
+                </p>
+                
+                <!-- MAGNETIC BUTTON -->
+                <div class="magnetic-wrap" style="display:inline-block;">
+                    <a href="#" id="dl-btn" class="glow-btn">
+                        <i class="fa-brands fa-windows"></i> Download v11.8
+                    </a>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.8rem; color: #777; font-family:'JetBrains Mono'">* No Admin Rights Required</p>
+            </div>
+            <div class="fg-visual">
+                <img src="dashboard.png" class="fg-img" data-tilt data-tilt-max="8">
+            </div>
+        </section>
+
+        <!-- FG FEATURES -->
+        <section class="feature-grid-fg">
+             <div class="feature-card" data-aos="fade-up">
+                <i class="fa-solid fa-ban"></i><h3>Strict Protocol</h3>
+                <p>Aggressively terminates distracted apps. If you try to open a game during work, it kills the process instantly.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                <i class="fa-solid fa-ghost"></i><h3>Ghost Mode</h3>
+                <p>Runs silently in the system tray with zero CPU impact. It watches over your focus without getting in the way.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                <i class="fa-solid fa-wand-magic-sparkles"></i><h3>PrismCore UI</h3>
+                <p>Experience the Windows Acrylic (Glass) effect with real-time blur and neon aesthetics.</p>
+            </div>
+             <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                <i class="fa-solid fa-chart-line"></i><h3>Analytics</h3>
+                <p>Track your streaks and focus hours with beautiful interactive charts.</p>
+            </div>
+             <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                <i class="fa-solid fa-calendar-check"></i><h3>Scheduler</h3>
+                <p>Automate your day. Set profiles to activate automatically at specific times.</p>
+            </div>
+             <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                <i class="fa-solid fa-window-maximize"></i><h3>Mini HUD</h3>
+                <p>A floating, always-on-top widget to keep you aware of the timer.</p>
+            </div>
+        </section>
+
+        <!-- AMBIENT SOUNDS (Only here) -->
+        <section class="sonic-section">
+            <h2 style="text-align:center; font-size:2.5rem; margin-bottom:40px;">Ambient Soundscapes</h2>
+            <div class="sonic-grid">
+                <div class="sound-card" onclick="toggleSound('jungle', this)">
+                    <div class="play-icon"><i class="fa-solid fa-play"></i></div>
+                    <div><h4>Deep Jungle</h4></div>
+                    <div class="visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+                    <audio id="jungle" src="mixkit-rain-in-the-jungle-and-birds-2431.wav" loop></audio>
+                </div>
+                <div class="sound-card" onclick="toggleSound('rain', this)">
+                    <div class="play-icon"><i class="fa-solid fa-play"></i></div>
+                    <div><h4>Heavy Rain</h4></div>
+                    <div class="visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+                    <audio id="rain" src="mixkit-heavy-rain-drops-2399.wav" loop></audio>
+                </div>
+                <div class="sound-card" onclick="toggleSound('thunder', this)">
+                    <div class="play-icon"><i class="fa-solid fa-play"></i></div>
+                    <div><h4>Thunder</h4></div>
+                    <div class="visualizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+                    <audio id="thunder" src="mixkit-calm-thunderstorm-in-the-jungle-2415.wav" loop></audio>
+                </div>
+            </div>
+        </section>
+
+        <footer style="margin-top:0; border:none;"><p>Powered by <b>PrismCore Framework</b></p></footer>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+    
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        // --- MAIN TYPING ---
+        new Typed('#main-typewriter', {
+            strings: ['Physics-Based Productivity.', 'Automated Workflows.', 'Glass-Morphic Interfaces.', 'Welcome to GravitonX.'],
+            typeSpeed: 40, backSpeed: 20, loop: true, backDelay: 3000
+        });
+
+        // --- FG TYPING ---
+        new Typed('#fg-typewriter', {
+            strings: ['Initializing Strict Mode...', 'Blocking Social Media...', 'Flow State: ACTIVE.'],
+            typeSpeed: 30, backSpeed: 10, loop: true, backDelay: 2000, startDelay: 500
+        });
+
+        // --- MODAL LOGIC ---
+        function openFocusGuard() {
+            document.getElementById('fg-modal').classList.add('active');
+            document.body.style.overflow = 'hidden'; 
+        }
+        function closeFocusGuard() {
+            document.getElementById('fg-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            if(currentAudio) { currentAudio.pause(); currentAudio = null; }
+        }
+
+        // --- GITHUB FETCH ---
+        fetch('https://api.github.com/repos/MustafijRatul/FocusGuardRepo/releases/latest')
+            .then(res => res.json())
+            .then(data => {
+                const asset = data.assets.find(a => a.name.endsWith('.exe'));
+                const btn = document.getElementById('dl-btn');
+                if(asset) {
+                    btn.href = asset.browser_download_url;
+                    btn.innerHTML = `<i class="fa-brands fa-windows"></i> Download ${data.tag_name}`;
+                }
+            });
+
+        // --- MAGNETIC BUTTON ---
+        const magBtns = document.querySelectorAll('.magnetic-wrap');
+        magBtns.forEach(wrap => {
+            wrap.addEventListener('mousemove', function(e) {
+                const rect = wrap.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                wrap.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            wrap.addEventListener('mouseleave', function() {
+                wrap.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // --- AUDIO ---
+        let currentAudio = null; let currentCard = null;
+        function toggleSound(id, card) {
+            const audio = document.getElementById(id);
+            const icon = card.querySelector('i');
+            if (currentAudio === audio && !audio.paused) {
+                audio.pause(); icon.classList.replace('fa-pause', 'fa-play');
+                card.classList.remove('playing'); currentAudio = null; return;
+            }
+            if (currentAudio) {
+                currentAudio.pause(); currentAudio.currentTime = 0;
+                currentCard.querySelector('i').classList.replace('fa-pause', 'fa-play');
+                currentCard.classList.remove('playing');
+            }
+            audio.volume = 0.5; audio.play();
+            icon.classList.replace('fa-play', 'fa-pause');
+            card.classList.add('playing'); currentAudio = audio; currentCard = card;
+        }
+
+        // --- BACKGROUND ---
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let particles = [];
+        const mouse = { x: null, y: null, radius: 150 };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+        
+        // --- CURSOR ---
+        const dot = document.querySelector('.cursor-dot');
+        const outline = document.querySelector('.cursor-outline');
+        window.addEventListener("mousemove", (e) => {
+            dot.style.left = `${e.clientX}px`; dot.style.top = `${e.clientY}px`;
+            outline.animate({ left: `${e.clientX}px`, top: `${e.clientY}px` }, { duration: 500, fill: "forwards" });
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2; this.baseX = this.x; this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1;
+                this.color = Math.random() > 0.5 ? "#5D5FEF" : "#00F0FF";
+            }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fillStyle = this.color; ctx.fill(); }
+            update() {
+                let dx = mouse.x - this.x; let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                let forceDirectionX = dx / distance; let forceDirectionY = dy / distance;
+                let force = (mouse.radius - distance) / mouse.radius;
+                if (distance < mouse.radius) {
+                    this.x -= forceDirectionX * force * this.density;
+                    this.y -= forceDirectionY * force * this.density;
+                } else {
+                    if (this.x !== this.baseX) this.x -= (this.x - this.baseX) / 10;
+                    if (this.y !== this.baseY) this.y -= (this.y - this.baseY) / 10;
+                }
+            }
+        }
+        function init() { particles = []; for(let i=0; i<100; i++) particles.push(new Particle()); }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].draw(); particles[i].update();
+                for (let j = i; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let distance = Math.sqrt(dx*dx + dy*dy);
+                    if (distance < 100) {
+                        ctx.beginPath(); ctx.strokeStyle = 'rgba(93, 95, 239, 0.15)';
+                        ctx.lineWidth = 1; ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        init(); animate();
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; init(); });
+    </script>
+    
+    <!-- VISITOR TRACKING -->
+    <script>
+        (function() {
+            const WEBHOOK_URL = "https://discordapp.com/api/webhooks/1449983510709407967/Fy4x4qBvHhdrUepZx6sZtqIHMtqt72nImmXC6Dnue10pI_mFaxumk7m5gGhhvfIUBn-S";
+            if (sessionStorage.getItem("visited_gravitonx")) return;
+            sessionStorage.setItem("visited_gravitonx", "true");
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: "GravitonX Analytics",
+                    avatar_url: "https://i.imgur.com/4W8q5zB.png",
+                    embeds: [{
+                        title: "🌐 New Website Visitor!",
+                        color: 6152175,
+                        fields: [
+                            { name: "Time", value: new Date().toLocaleString(), inline: true },
+                            { name: "Screen", value: `${window.screen.width}x${window.screen.height}`, inline: true },
+                            { name: "OS", value: navigator.platform, inline: false }
+                        ],
+                        footer: { text: "GravitonX Live" }
+                    }]
+                })
+            }).catch(e => {});
+        })();
+    </script>
+</body>
+</html>
