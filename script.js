@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     if (distance < 150) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.7 * (1 - distance/150)})`;
+                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.9 * (1 - distance/150)})`;
                         ctx.lineWidth = 1;
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(mouse.x, mouse.y);
@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     if (distance < 100) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.4 * (1 - distance/100)})`;
+                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.6 * (1 - distance/100)})`;
                         ctx.lineWidth = 0.5;
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(p2.x, p2.y);
@@ -226,5 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+
 
 
