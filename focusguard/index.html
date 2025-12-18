@@ -13,53 +13,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
 
     <style>
-        /* --- CRITICAL FIX: CURSOR Z-INDEX --- */
-        /* Forces the custom cursor to sit ON TOP of the download overlay */
-        .cursor-dot, .cursor-outline {
-            z-index: 20001 !important;
-            pointer-events: none; /* Ensure clicks pass through */
-        }
-
-        /* --- PDF MODAL FIXES --- */
-        #pdf-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        #pdf-modal.active { display: flex; }
-
-        .pdf-header {
-            width: 90%;
-            max-width: 1200px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .pdf-container {
-            width: 90%;
-            max-width: 1200px;
-            height: 85vh;
-            background: #1a1a1a;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
-        }
-
-        .pdf-frame { width: 100%; height: 100%; border: none; display: block; }
-
         /* --- MOBILE RESPONSIVE TWEAKS --- */
         @media (max-width: 900px) {
             nav { padding: 20px; flex-direction: column; gap: 15px; }
@@ -69,9 +22,6 @@
             .fg-hero div[style*="display:flex"] { justify-content: center; }
             .fg-hero img { margin-top: 20px; }
             .grid-3 { grid-template-columns: 1fr !important; gap: 20px !important; padding: 0 20px; }
-            .pdf-container { width: 100% !important; height: 90vh !important; border-radius: 0; }
-            .pdf-header { width: 100%; }
-            #pdf-modal { padding: 10px 0; }
             .glass-card { margin-bottom: 10px; }
         }
         
@@ -105,7 +55,7 @@
             z-index: 10000;
             align-items: center; justify-content: center;
             opacity: 0; transition: opacity 0.5s ease;
-            cursor: default; /* Ensure mouse is visible */
+            cursor: default;
         }
         #download-overlay.active { display: flex; opacity: 1; }
 
@@ -127,12 +77,17 @@
 
         #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
 
+        /* --- CRITICAL FIX: CURSOR Z-INDEX --- */
+        .cursor-dot, .cursor-outline {
+            z-index: 20001 !important;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 	<div class="noise-overlay"></div>
     <div class="page-transition"></div>
-    <!-- Custom Cursor Elements -->
+    <!-- Custom Cursor -->
     <div class="cursor-dot"></div> <div class="cursor-outline"></div> 
     
     <canvas id="neural-canvas"></canvas>
@@ -155,12 +110,18 @@
                 Aggressively terminate distractions using the <b>Verlet-X</b> logic engine. Experience flow state like never before.
             </p>
             <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                
+                <!-- MAIN APP DOWNLOAD BUTTON -->
                 <button onclick="startDownloadFlow()" id="dl-btn-real" class="btn-glow">
-                    <i class="fa-brands fa-windows"></i> Download v12.0
+                    <i class="fa-brands fa-windows"></i> Download App v11.8
                 </button>
-                <button onclick="openPdfReader()" class="btn-glow" style="background:rgba(255,255,255,0.1); box-shadow:none;">
-                    <i class="fa-solid fa-book-open"></i> Read Manual
-                </button>
+                
+                <!-- MANUAL DOWNLOAD BUTTON (Direct Link, No Modal) -->
+                <!-- Ensure FocusGuard_Pro_User_Manual.pdf is in the same folder -->
+                <a href="../FocusGuard_Pro_User_Manual.pdf" download class="btn-glow" style="background:rgba(255,255,255,0.1); box-shadow:none; text-decoration:none;">
+                    <i class="fa-solid fa-file-arrow-down"></i> Download Manual
+                </a>
+
             </div>
             <p style="margin-top:10px; color:#666; font-size:0.8rem;">* No Admin Rights Required</p>
         </div>
@@ -207,7 +168,7 @@
         </div>
     </section>
 
-    <!-- DOWNLOAD OVERLAY -->
+    <!-- DOWNLOAD OVERLAY FOR APP -->
     <div id="download-overlay">
         <canvas id="confetti-canvas"></canvas>
         <div class="success-card">
@@ -216,23 +177,12 @@
                 <div class="success-circle"><i class="fa-solid fa-bolt"></i></div>
             </div>
             <h2 style="font-size:2rem; margin-bottom:10px;">Protocol <span class="text-grad">Initiated.</span></h2>
-            <p style="color:#aaa; margin-bottom:30px;">Your download of FocusGuard Pro v12.0 has started.<br></p>
+            <p style="color:#aaa; margin-bottom:30px;">Your download of FocusGuard Pro v11.8 has started.<br>Welcome to the top 1%.</p>
             <div style="display:flex; gap:15px; justify-content:center;">
                 <button onclick="closeDownloadOverlay()" class="btn-glow" style="padding:10px 25px;">Back to Product</button>
                 <a href="../index.html" class="btn-glow" style="background:transparent; border:1px solid #333; box-shadow:none;">Home</a>
             </div>
             <p style="margin-top:20px; font-size:0.8rem; color:#666;">Download didn't start? <a href="#" id="retry-link" style="color:var(--accent);">Click here</a></p>
-        </div>
-    </div>
-
-    <!-- PDF VIEWER MODAL -->
-    <div id="pdf-modal">
-        <div class="pdf-header">
-            <span style="font-weight:bold; color:white;">User Manual</span>
-            <button onclick="closePdfReader()" style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="pdf-container">
-            <iframe src="../FocusGuard_Pro_User_Manual.pdf#view=FitH&toolbar=1" class="pdf-frame"></iframe>
         </div>
     </div>
 
@@ -290,9 +240,6 @@
             strings: ['Kill Distractions.', 'Boost Productivity.', 'Enter Flow State.', 'Block Games & Socials.'],
             typeSpeed: 60, backSpeed: 40, backDelay: 1500, loop: true, showCursor: true, cursorChar: '|',
         });
-
-        function openPdfReader() { document.getElementById('pdf-modal').classList.add('active'); document.body.style.overflow = 'hidden'; }
-        function closePdfReader() { document.getElementById('pdf-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
 
         let currentAudio = null; let currentCard = null;
         function toggleSound(id, card) {
