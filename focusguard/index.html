@@ -5,135 +5,88 @@
     <title>FocusGuard Pro | GravitonX</title>
     <link rel="icon" href="../appicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../style.css">
     
+    <!-- FONTS & LIBS -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
 
+    <!-- LINK TO MAIN CSS -->
+    <link rel="stylesheet" href="../style.css">
+
     <style>
-        /* --- MOBILE RESPONSIVE TWEAKS --- */
-        @media (max-width: 900px) {
-            nav { padding: 20px; flex-direction: column; gap: 15px; }
-            .fg-hero { flex-direction: column !important; gap: 40px !important; text-align: center; padding-top: 120px !important; }
-            .fg-hero h1 { font-size: 2.8rem !important; }
-            .typing-container { justify-content: center !important; min-height: 40px; }
-            .fg-hero div[style*="display:flex"] { justify-content: center; }
-            .fg-hero img { margin-top: 20px; }
-            .grid-3 { grid-template-columns: 1fr !important; gap: 20px !important; padding: 0 20px; }
-            .glass-card { margin-bottom: 10px; }
-        }
+        /* PAGE SPECIFIC SAFETY STYLES */
         
-        .typing-text {
-            color: var(--accent);
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-
-        /* --- AUDIO ANIMATIONS --- */
-        .equalizer { display: flex; align-items: flex-end; height: 20px; gap: 3px; margin-left: auto; opacity: 0; transition: opacity 0.3s ease; }
-        .bar { width: 4px; background: var(--accent); border-radius: 2px; animation: bounce 0s infinite ease-in-out; }
-        .glass-card.playing { border-color: var(--accent); box-shadow: 0 0 25px rgba(93, 95, 239, 0.4); background: rgba(30, 30, 35, 0.9); }
-        .glass-card.playing .equalizer { opacity: 1; }
-        @keyframes bounce { 0%, 100% { height: 3px; } 50% { height: 18px; } }
-        .glass-card.playing .bar:nth-child(1) { animation-duration: 0.6s; }
-        .glass-card.playing .bar:nth-child(2) { animation-duration: 0.8s; }
-        .glass-card.playing .bar:nth-child(3) { animation-duration: 0.5s; }
-        .glass-card.playing .bar:nth-child(4) { animation-duration: 0.7s; }
-        .glass-card.playing .bar:nth-child(5) { animation-duration: 0.9s; }
-        .glass-card.playing .icon-circle { animation: pulse-glow 2s infinite; background: var(--accent) !important; }
-        @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(93, 95, 239, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(93, 95, 239, 0); } 100% { box-shadow: 0 0 0 0 rgba(93, 95, 239, 0); } }
-
-        /* --- DOWNLOAD OVERLAY STYLES --- */
-        #download-overlay {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(15px);
-            z-index: 10000;
-            align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.5s ease;
-            cursor: default;
-        }
-        #download-overlay.active { display: flex; opacity: 1; }
-
-        .success-card {
-            text-align: center; padding: 50px 40px; max-width: 450px; width: 90%;
-            background: #0F0F12; border: 1px solid var(--accent); border-radius: 24px;
-            box-shadow: 0 0 80px rgba(93, 95, 239, 0.2);
-            transform: translateY(50px); opacity: 0; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative; z-index: 2;
-        }
-        #download-overlay.active .success-card { transform: translateY(0); opacity: 1; }
-
-        /* Pulse Icon */
-        .icon-wrapper { position: relative; width: 80px; height: 80px; margin: 0 auto 25px auto; display: flex; align-items: center; justify-content: center; }
-        .success-circle { width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; z-index: 2; }
-        .ripple { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; animation: rippleEffect 2s infinite; }
-        .ripple:nth-child(2) { animation-delay: 0.5s; }
-        @keyframes rippleEffect { 0% { width: 60px; height: 60px; opacity: 0.8; } 100% { width: 150px; height: 150px; opacity: 0; } }
-
-        #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-
-        /* --- CRITICAL FIX: CURSOR Z-INDEX --- */
+        /* Ensure Cursor is ALWAYS on top of the download overlay */
         .cursor-dot, .cursor-outline {
-            z-index: 20001 !important;
-            pointer-events: none;
+            z-index: 999999 !important; 
         }
+
+        /* Download Overlay Cursor Visibility */
+        #download-overlay {
+            cursor: default !important;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 900px) {
+            .fg-hero { flex-direction: column !important; text-align: center; gap: 30px !important; }
+            .fg-hero h1 { font-size: 2.8rem !important; }
+            .typing-container { justify-content: center !important; }
+            .grid-3 { grid-template-columns: 1fr !important; padding: 0 20px; }
+            .success-card { padding: 30px 20px; }
+        }
+
+        /* Typewriter Color Override */
+        .typing-text { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: bold; font-size: 1.5rem; }
     </style>
 </head>
 <body>
-	<div class="noise-overlay"></div>
+    <!-- UTILS -->
+    <div class="noise-overlay"></div>
     <div class="page-transition"></div>
-    <!-- Custom Cursor -->
     <div class="cursor-dot"></div> <div class="cursor-outline"></div> 
-    
     <canvas id="neural-canvas"></canvas>
 
+    <!-- NAV -->
     <nav>
         <a href="../index.html" class="logo"><img src="../appicon.png"> FocusGuard Pro</a>
         <div class="nav-links">
-            <a href="../products/index.html"> < Back to Labs</a>
+            <a href="../index.html"> < Back to Labs</a>
         </div>
     </nav>
 
-    <!-- HERO -->
+    <!-- HERO SECTION -->
     <section class="section fg-hero" style="display:flex; align-items:center; gap:50px; min-height: 90vh;">
         <div style="flex:1;" data-aos="fade-right">
             <h1 style="font-size:4rem; line-height:1;">Regain <span class="text-grad">Focus.</span></h1>
-            <div class="typing-container" style="display: flex; align-items: center; justify-content: flex-start; margin-top: 15px;">
+            
+            <div class="typing-container" style="justify-content: flex-start; margin-top: 15px; display:flex; align-items:center;">
                 <span id="fg-typewriter" class="typing-text"></span>
             </div>
+
             <p style="color:#ccc; font-size:1.2rem; margin-bottom: 30px; margin-top: 15px;">
                 Aggressively terminate distractions using the <b>Verlet-X</b> logic engine. Experience flow state like never before.
             </p>
+
             <div style="display:flex; gap:15px; flex-wrap:wrap;">
                 
-                <!-- MAIN APP DOWNLOAD BUTTON -->
-                <button onclick="startDownloadFlow()" id="dl-btn-real" class="btn-glow">
-                    <i class="fa-brands fa-windows"></i> Download App v11.8
+                <!-- APP DOWNLOAD BUTTON (Triggers Overlay) -->
+                <!-- Added no-transition to prevent black screen -->
+                <button onclick="startDownloadFlow()" id="dl-btn-real" class="btn-glow no-transition">
+                    <i class="fa-brands fa-windows"></i> Download App v12.0
                 </button>
                 
-                <!-- MANUAL DOWNLOAD BUTTON (Direct Link, No Modal) -->
-                <!-- Ensure FocusGuard_Pro_User_Manual.pdf is in the same folder -->
-                <div style="display:flex; gap:15px; flex-wrap:wrap;">
-    
-				<!-- MAIN APP DOWNLOAD (Triggers Overlay) -->
-				<button onclick="startDownloadFlow()" id="dl-btn-real" class="btn-glow">
-					<i class="fa-brands fa-windows"></i> Download App v11.8
-				</button>
-				
-				<!-- MANUAL DOWNLOAD (Direct Link, No Transition) -->
-				<!-- Added 'no-transition' class explicitly -->
-				<a href="../FocusGuard_Pro_User_Manual.pdf" download class="btn-glow no-transition" style="background:rgba(255,255,255,0.1); box-shadow:none; text-decoration:none;">
-					<i class="fa-solid fa-file-arrow-down"></i> Download Manual
-				</a>
+                <!-- MANUAL DOWNLOAD BUTTON (Direct File Link) -->
+                <!-- 'download' attribute forces download, 'no-transition' stops animation script -->
+                <a href="../FocusGuard_Pro_User_Manual.pdf" download class="btn-glow no-transition" style="background:rgba(255,255,255,0.1); box-shadow:none; text-decoration:none;">
+                    <i class="fa-solid fa-file-arrow-down"></i> Download Manual
+                </a>
 
             </div>
             <p style="margin-top:10px; color:#666; font-size:0.8rem;">* No Admin Rights Required</p>
         </div>
+        
         <div style="flex:1;" data-aos="zoom-in">
             <img src="../dashboard.png" style="width:100%; border-radius:20px; border:1px solid rgba(255,255,255,0.2); box-shadow:0 30px 80px rgba(93,95,239,0.3);" data-tilt>
         </div>
@@ -143,19 +96,19 @@
     <section class="section" style="padding-top:0;">
         <h2 style="text-align:center; margin-bottom:50px; font-size:2.5rem;" data-aos="fade-up">System Capabilities</h2>
         <div class="grid-3">
-             <div class="glass-card" data-aos="fade-up"><i class="fa-solid fa-ban" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>Strict Protocol</h3><p>Aggressively terminates distracted apps.</p></div>
-             <div class="glass-card" data-aos="fade-up" data-aos-delay="100"><i class="fa-solid fa-ghost" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>Ghost Mode</h3><p>Runs silently in the system tray.</p></div>
-             <div class="glass-card" data-aos="fade-up" data-aos-delay="200"><i class="fa-solid fa-wand-magic-sparkles" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>GravitonX UI</h3><p>Proprietary Windows DWM Framework.</p></div>
-             <div class="glass-card" data-aos="fade-up" data-aos-delay="300"><i class="fa-solid fa-chart-line" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>Deep Analytics</h3><p>Track your productivity with charts.</p></div>
+             <div class="glass-card" data-aos="fade-up"><i class="fa-solid fa-ban" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>Strict Protocol</h3><p>Aggressively terminates distracted apps instantly.</p></div>
+             <div class="glass-card" data-aos="fade-up" data-aos-delay="100"><i class="fa-solid fa-ghost" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>Ghost Mode</h3><p>Runs silently in the system tray with near-zero CPU impact.</p></div>
+             <div class="glass-card" data-aos="fade-up" data-aos-delay="200"><i class="fa-solid fa-wand-magic-sparkles" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>GravitonX UI</h3><p>Built on our proprietary UI framework using Windows DWM API.</p></div>
+             <div class="glass-card" data-aos="fade-up" data-aos-delay="300"><i class="fa-solid fa-chart-line" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>Deep Analytics</h3><p>Track your productivity with interactive charts.</p></div>
              <div class="glass-card" data-aos="fade-up" data-aos-delay="400"><i class="fa-solid fa-calendar-check" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>Auto-Pilot</h3><p>Schedule your day automatically.</p></div>
-             <div class="glass-card" data-aos="fade-up" data-aos-delay="500"><i class="fa-solid fa-file-shield" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>Task Intent</h3><p>Log what you are working on.</p></div>
+             <div class="glass-card" data-aos="fade-up" data-aos-delay="500"><i class="fa-solid fa-file-shield" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i><h3>Task Intent</h3><p>Log exactly what you are working on before every session.</p></div>
         </div>
     </section>
 
-    <!-- SONIC SECTION -->
+    <!-- AMBIENT ENGINE -->
     <section class="section">
         <h2 style="text-align:center; margin-bottom:40px; font-size:2.5rem;">Ambient Engine</h2>
-        <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="grid-3">
             <div class="glass-card" onclick="toggleSound('jungle', this)" style="flex-direction:row; align-items:center; padding:20px; cursor:pointer; transition: all 0.3s ease;">
                 <div class="icon-circle" style="background:var(--primary); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fa-solid fa-play" style="font-size:0.8rem; color:white;"></i></div>
                 <div style="margin-left:15px;"><h4>Deep Jungle</h4></div>
@@ -177,7 +130,7 @@
         </div>
     </section>
 
-    <!-- DOWNLOAD OVERLAY FOR APP -->
+    <!-- DOWNLOAD SUCCESS OVERLAY -->
     <div id="download-overlay">
         <canvas id="confetti-canvas"></canvas>
         <div class="success-card">
@@ -186,10 +139,12 @@
                 <div class="success-circle"><i class="fa-solid fa-bolt"></i></div>
             </div>
             <h2 style="font-size:2rem; margin-bottom:10px;">Protocol <span class="text-grad">Initiated.</span></h2>
-            <p style="color:#aaa; margin-bottom:30px;">Your download of FocusGuard Pro v11.8 has started.<br>Welcome to the top 1%.</p>
+            <p style="color:#aaa; margin-bottom:30px;">Your download of FocusGuard Pro v12.0 has started.<br>Welcome to the top 1%.</p>
             <div style="display:flex; gap:15px; justify-content:center;">
                 <button onclick="closeDownloadOverlay()" class="btn-glow" style="padding:10px 25px;">Back to Product</button>
-                <a href="../index.html" class="btn-glow" style="background:transparent; border:1px solid #333; box-shadow:none;">Home</a>
+                
+                <!-- HOME BUTTON (No Transition for safety) -->
+                <a href="../index.html" class="btn-glow no-transition" style="background:transparent; border:1px solid #333; box-shadow:none; text-decoration:none;">Home</a>
             </div>
             <p style="margin-top:20px; font-size:0.8rem; color:#666;">Download didn't start? <a href="#" id="retry-link" style="color:var(--accent);">Click here</a></p>
         </div>
@@ -202,11 +157,13 @@
     <!-- SCRIPTS -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+    <!-- LINK TO MAIN SCRIPT -->
     <script src="../script.js"></script>
     
     <script>
         VanillaTilt.init(document.querySelector("img[data-tilt]"), { max: 15, speed: 400 });
 
+        // --- FETCH GITHUB DOWNLOAD URL ---
         let downloadUrl = "";
         fetch('https://api.github.com/repos/MustafijRatul/FocusGuardRepo/releases/latest')
             .then(res => res.json())
@@ -218,26 +175,57 @@
                 }
             });
 
+        // --- DOWNLOAD FLOW ---
         function startDownloadFlow() {
             if(!downloadUrl) { alert("Fetching latest version... please wait."); return; }
-            const link = document.createElement('a'); link.href = downloadUrl; link.download = ''; document.body.appendChild(link); link.click(); document.body.removeChild(link);
-            const overlay = document.getElementById('download-overlay'); overlay.classList.add('active');
+            
+            // Trigger Download
+            const link = document.createElement('a'); 
+            link.href = downloadUrl; 
+            link.setAttribute('download', '');
+            document.body.appendChild(link); 
+            link.click(); 
+            document.body.removeChild(link);
+
+            // Show Overlay
+            const overlay = document.getElementById('download-overlay'); 
+            overlay.classList.add('active');
             initConfetti();
         }
-        function closeDownloadOverlay() { document.getElementById('download-overlay').classList.remove('active'); }
 
+        function closeDownloadOverlay() { 
+            document.getElementById('download-overlay').classList.remove('active'); 
+        }
+
+        // --- CONFETTI LOGIC ---
         function initConfetti() {
-            const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            let confetti = []; const colors = ['#5D5FEF', '#FF4DFF', '#00D26A', '#ffffff'];
+            const canvas = document.getElementById('confetti-canvas'); 
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight;
+            
+            let confetti = []; 
+            const colors = ['#5D5FEF', '#FF4DFF', '#00D26A', '#ffffff'];
+
             for (let i = 0; i < 150; i++) {
-                confetti.push({ x: canvas.width / 2, y: canvas.height / 2, w: Math.random() * 8 + 4, h: Math.random() * 8 + 4, color: colors[Math.floor(Math.random() * colors.length)], vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20, gravity: 0.15, rotation: Math.random() * 360, rotationSpeed: (Math.random() - 0.5) * 0.2 });
+                confetti.push({ 
+                    x: canvas.width/2, y: canvas.height/2, 
+                    w: Math.random()*8+4, h: Math.random()*8+4, 
+                    color: colors[Math.floor(Math.random()*colors.length)], 
+                    vx: (Math.random()-0.5)*20, vy: (Math.random()-0.5)*20, 
+                    gravity: 0.15, rotation: Math.random()*360, 
+                    rotationSpeed: (Math.random()-0.5)*0.2 
+                });
             }
             function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height); let active = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                let active = false;
                 confetti.forEach((c, i) => {
-                    c.x += c.vx; c.y += c.vy; c.vy += c.gravity; c.rotation += c.rotationSpeed; c.w *= 0.96; c.h *= 0.96;
-                    ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.rotation); ctx.fillStyle = c.color; ctx.fillRect(-c.w/2, -c.h/2, c.w, c.h); ctx.restore();
+                    c.x += c.vx; c.y += c.vy; c.vy += c.gravity; 
+                    c.rotation += c.rotationSpeed; c.w *= 0.96; c.h *= 0.96;
+                    ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.rotation); 
+                    ctx.fillStyle = c.color; ctx.fillRect(-c.w/2, -c.h/2, c.w, c.h); 
+                    ctx.restore();
                     if(c.w > 0.2 && c.y < canvas.height) active = true;
                 });
                 if(active && document.getElementById('download-overlay').classList.contains('active')) requestAnimationFrame(animate);
@@ -245,19 +233,30 @@
             animate();
         }
 
-        var typed = new Typed('#fg-typewriter', {
+        // --- TYPEWRITER ---
+        new Typed('#fg-typewriter', {
             strings: ['Kill Distractions.', 'Boost Productivity.', 'Enter Flow State.', 'Block Games & Socials.'],
-            typeSpeed: 60, backSpeed: 40, backDelay: 1500, loop: true, showCursor: true, cursorChar: '|',
+            typeSpeed: 60, backSpeed: 40, backDelay: 1500, loop: true, showCursor: false
         });
 
+        // --- AUDIO PLAYER ---
         let currentAudio = null; let currentCard = null;
         function toggleSound(id, card) {
             const audio = document.getElementById(id); const icon = card.querySelector('i');
-            if (currentAudio === audio && !audio.paused) { audio.pause(); icon.classList.replace('fa-pause', 'fa-play'); card.classList.remove('playing'); currentAudio = null; return; }
-            if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentCard.querySelector('i').classList.replace('fa-pause', 'fa-play'); currentCard.classList.remove('playing'); }
-            audio.volume = 0.5; audio.play(); icon.classList.replace('fa-play', 'fa-pause'); card.classList.add('playing'); currentAudio = audio; currentCard = card;
+            if (currentAudio === audio && !audio.paused) { 
+                audio.pause(); icon.classList.replace('fa-pause', 'fa-play'); 
+                card.classList.remove('playing'); currentAudio = null; return; 
+            }
+            if (currentAudio) { 
+                currentAudio.pause(); currentAudio.currentTime = 0; 
+                currentCard.querySelector('i').classList.replace('fa-pause', 'fa-play'); 
+                currentCard.classList.remove('playing'); 
+            }
+            audio.volume = 0.5; audio.play(); 
+            icon.classList.replace('fa-play', 'fa-pause'); 
+            card.classList.add('playing'); 
+            currentAudio = audio; currentCard = card;
         }
     </script>
 </body>
 </html>
-
