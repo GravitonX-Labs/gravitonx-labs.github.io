@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     if (dist < 150) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.8 * (1 - dist / 150)})`;
+                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.9 * (1 - dist / 150)})`;
                         ctx.lineWidth = 1.2;
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(mouse.x, mouse.y);
@@ -250,5 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+
 
 
