@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 this.y = Math.random() * height;
                 this.vx = (Math.random() - 0.5) * 0.5;
                 this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2; // UNCHANGED
+                this.size = Math.random() * 1.2; // UNCHANGED
                 this.color = Math.random() > 0.5 ? "#5D5FEF" : "#00F0FF";
             }
 
@@ -250,3 +250,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+
