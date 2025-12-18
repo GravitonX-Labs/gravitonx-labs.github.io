@@ -1,4 +1,4 @@
-// script.js - ULTRA BRIGHT INTERACTIVE VERSION
+// script.js - FIXED VISIBILITY VERSION
 
 document.addEventListener("DOMContentLoaded", () => {
     
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(outline) outline.style.display = "none";
     }
 
-    // --- 4. NEURAL BACKGROUND (HIGH VISIBILITY) ---
+    // --- 4. NEURAL BACKGROUND (OPTIMIZED & VISIBLE) ---
     const canvas = document.getElementById('neural-canvas');
     if(canvas) {
         const ctx = canvas.getContext('2d');
@@ -84,9 +84,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 this.x += this.vx;
                 this.y += this.vy;
 
+                // Bounce off edges
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
+                // Interaction Physics
                 if(mouse.x != null) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
@@ -119,14 +121,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
                 
+                // Only glow particles, NOT lines (Performance Fix)
                 if(this.color === "#00F0FF") {
                     ctx.shadowBlur = 15;
                     ctx.shadowColor = "#00F0FF";
                 } else {
                     ctx.shadowBlur = 0;
                 }
+                
                 ctx.fill();
-                ctx.shadowBlur = 0;
+                ctx.shadowBlur = 0; // Reset immediately
             }
         }
 
@@ -145,32 +149,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 p.update();
                 p.draw();
 
-                // 1. MOUSE CONNECTIONS (BRIGHTER & THICKER)
+                // 1. MOUSE CONNECTIONS (BRIGHTER)
                 if (mouse.x != null) {
                     let dx = p.x - mouse.x;
                     let dy = p.y - mouse.y;
                     let distance = Math.sqrt(dx*dx + dy*dy);
 
-                    if (distance < 200) {
+                    if (distance < 250) { // Increased Range
                         ctx.beginPath();
-                        // 100% Opacity at center (1 * ...)
-                        ctx.strokeStyle = `rgba(255, 255, 255, ${1 * (1 - distance/200)})`;
-                        ctx.lineWidth = 2.5; // Thicker line
                         
-                        // Add White Glow to the Line
-                        ctx.shadowBlur = 10;
-                        ctx.shadowColor = "white";
-
+                        // CHANGED: Pure White color for max visibility
+                        // CHANGED: Opacity math allows it to be solid (1.0) at center
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance/250})`;
+                        
+                        ctx.lineWidth = 1; // Keep thin for elegance
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(mouse.x, mouse.y);
                         ctx.stroke();
-                        
-                        // Reset Shadow
-                        ctx.shadowBlur = 0;
                     }
                 }
 
-                // 2. AMBIENT CONNECTIONS (Subtle)
+                // 2. AMBIENT CONNECTIONS
                 for (let j = i; j < particles.length; j++) {
                     let p2 = particles[j];
                     let dx = p.x - p2.x;
@@ -179,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     if (distance < 100) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.2 * (1 - distance/100)})`;
+                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.15 * (1 - distance/100)})`;
                         ctx.lineWidth = 0.5;
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(p2.x, p2.y);
