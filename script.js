@@ -1,4 +1,4 @@
-// script.js - ENHANCED CONNECTIVITY VERSION
+// script.js - ULTRA BRIGHT INTERACTIVE VERSION
 
 document.addEventListener("DOMContentLoaded", () => {
     
@@ -28,10 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const posX = e.clientX;
             const posY = e.clientY;
             
-            // Instant transform for dot
             dot.style.transform = `translate(${posX}px, ${posY}px)`;
             
-            // Smooth trail for outline
             outline.animate({
                 transform: `translate(${posX}px, ${posY}px)`
             }, { duration: 500, fill: "forwards" });
@@ -47,8 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const ctx = canvas.getContext('2d');
         let width, height, particles;
 
-        // Increased Radius for wider reach
-        let mouse = { x: null, y: null, radius: 280 }; 
+        let mouse = { x: null, y: null, radius: 250 };
 
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.x;
@@ -90,7 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
-                // Mouse Physics
                 if(mouse.x != null) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
@@ -100,19 +96,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         const forceDirectionX = dx / distance;
                         const forceDirectionY = dy / distance;
                         const force = (mouse.radius - distance) / mouse.radius;
-                        
-                        // Stronger push
-                        const directionX = forceDirectionX * force * this.density * 0.8;
-                        const directionY = forceDirectionY * force * this.density * 0.8;
+                        const directionX = forceDirectionX * force * this.density * 0.6;
+                        const directionY = forceDirectionY * force * this.density * 0.6;
                         
                         this.x -= directionX;
                         this.y -= directionY;
 
-                        this.color = "#00F0FF"; // Turn Cyan
-                        this.size = this.baseSize * 3; // Grow bigger
+                        this.color = "#00F0FF"; 
+                        this.size = this.baseSize * 2.5; 
                     } else {
                         this.color = this.baseColor;
-                        if(this.size > this.baseSize) this.size -= 0.1;
+                        if(this.size > this.baseSize) this.size -= 0.1; 
                     }
                 } else {
                     this.color = this.baseColor;
@@ -125,14 +119,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
                 
-                // Add stronger glow to energized particles
                 if(this.color === "#00F0FF") {
-                    ctx.shadowBlur = 20;
+                    ctx.shadowBlur = 15;
                     ctx.shadowColor = "#00F0FF";
                 } else {
                     ctx.shadowBlur = 0;
                 }
-                
                 ctx.fill();
                 ctx.shadowBlur = 0;
             }
@@ -141,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const initParticles = () => {
             resize();
             particles = [];
-            const count = window.innerWidth < 900 ? 50 : 100; 
+            const count = window.innerWidth < 900 ? 50 : 110; 
             for (let i = 0; i < count; i++) particles.push(new Particle());
         };
 
@@ -153,29 +145,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 p.update();
                 p.draw();
 
-                // 1. MOUSE CONNECTIONS (Highly Visible)
+                // 1. MOUSE CONNECTIONS (BRIGHTER & THICKER)
                 if (mouse.x != null) {
                     let dx = p.x - mouse.x;
                     let dy = p.y - mouse.y;
                     let distance = Math.sqrt(dx*dx + dy*dy);
 
-                    // Radius matches physics radius (280)
-                    if (distance < 280) {
+                    if (distance < 200) {
                         ctx.beginPath();
-                        // Cyan color matching the energized particles
-                        // Opacity stays higher for longer (0.9 max)
-                        ctx.strokeStyle = `rgba(0, 240, 255, ${0.9 * (1 - distance/280)})`;
+                        // 100% Opacity at center (1 * ...)
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${1 * (1 - distance/200)})`;
+                        ctx.lineWidth = 2.5; // Thicker line
                         
-                        // Thicker line near mouse
-                        ctx.lineWidth = 2.5 * (1 - distance/280); 
-                        
+                        // Add White Glow to the Line
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = "white";
+
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(mouse.x, mouse.y);
                         ctx.stroke();
+                        
+                        // Reset Shadow
+                        ctx.shadowBlur = 0;
                     }
                 }
 
-                // 2. BACKGROUND CONNECTIONS (Subtle)
+                // 2. AMBIENT CONNECTIONS (Subtle)
                 for (let j = i; j < particles.length; j++) {
                     let p2 = particles[j];
                     let dx = p.x - p2.x;
