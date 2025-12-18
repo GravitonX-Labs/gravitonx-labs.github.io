@@ -1,7 +1,7 @@
-// script.js - FINAL INTERACTIVE VERSION
+// script.js - FINAL INTERACTIVE VERSION (Enhanced Mesh)
 
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     // --- 1. SAFE ANIMATION INIT (AOS) ---
     if (typeof AOS !== 'undefined') {
         AOS.init({ duration: 800, once: true, offset: 50 });
@@ -10,12 +10,28 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 2. TYPING EFFECT ---
     const typeElement = document.getElementById('typewriter');
     if (typeElement && typeof Typed !== 'undefined') {
-        let pageText = ['System Status: ONLINE', 'Physics Engine: VERLET-X', 'Welcome to GravitonX.'];
+        let pageText = [
+            'System Status: ONLINE',
+            'Physics Engine: VERLET-X',
+            'Welcome to GravitonX.'
+        ];
+
         if (window.location.href.includes("products")) {
-            pageText = ['Accessing Database...', 'Loading Modules...', 'Deploying Ecosystem.'];
+            pageText = [
+                'Accessing Database...',
+                'Loading Modules...',
+                'Deploying Ecosystem.'
+            ];
         }
-        new Typed('#typewriter', { 
-            strings: pageText, typeSpeed: 40, backSpeed: 20, startDelay: 500, backDelay: 2000, loop: true, showCursor: false 
+
+        new Typed('#typewriter', {
+            strings: pageText,
+            typeSpeed: 40,
+            backSpeed: 20,
+            startDelay: 500,
+            backDelay: 2000,
+            loop: true,
+            showCursor: false
         });
     }
 
@@ -25,37 +41,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (window.matchMedia("(pointer: fine)").matches && dot && outline) {
         window.addEventListener("mousemove", (e) => {
-            const posX = e.clientX;
-            const posY = e.clientY;
-            
-            dot.style.transform = `translate(${posX}px, ${posY}px)`;
-            
-            outline.animate({
-                transform: `translate(${posX}px, ${posY}px)`
-            }, { duration: 500, fill: "forwards" });
+            const x = e.clientX;
+            const y = e.clientY;
+
+            dot.style.transform = `translate(${x}px, ${y}px)`;
+            outline.animate(
+                { transform: `translate(${x}px, ${y}px)` },
+                { duration: 500, fill: "forwards" }
+            );
         });
     } else {
-        if(dot) dot.style.display = "none";
-        if(outline) outline.style.display = "none";
+        if (dot) dot.style.display = "none";
+        if (outline) outline.style.display = "none";
     }
 
-    // --- 4. NEURAL BACKGROUND (INTERACTIVE) ---
+    // --- 4. NEURAL BACKGROUND (ENHANCED MESH) ---
     const canvas = document.getElementById('neural-canvas');
-    if(canvas) {
+    if (canvas) {
         const ctx = canvas.getContext('2d');
-        let width, height, particles;
+        let width, height, particles = [];
 
-        // Mouse/Touch Tracker
+        // Mouse / Touch tracker
         let mouse = { x: null, y: null, radius: 150 };
 
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         });
 
-        // Touch support
-        window.addEventListener('touchmove', (e) => {
-            if(e.touches.length > 0) {
+        window.addEventListener('touchmove', e => {
+            if (e.touches.length > 0) {
                 mouse.x = e.touches[0].clientX;
                 mouse.y = e.touches[0].clientY;
             }
@@ -80,37 +95,33 @@ document.addEventListener("DOMContentLoaded", () => {
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.5; // Slow ambient speed
+                this.vx = (Math.random() - 0.5) * 0.5;
                 this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2;
+                this.size = Math.random() * 2; // UNCHANGED
                 this.color = Math.random() > 0.5 ? "#5D5FEF" : "#00F0FF";
             }
+
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // Bounce off edges
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
-                // Mouse Interaction (Push effect)
-                if(mouse.x != null) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx*dx + dy*dy);
-                    
-                    if (distance < mouse.radius) {
-                        const forceDirectionX = dx / distance;
-                        const forceDirectionY = dy / distance;
-                        const force = (mouse.radius - distance) / mouse.radius;
-                        const directionX = forceDirectionX * force * 0.5; // Gentle push
-                        const directionY = forceDirectionY * force * 0.5;
-                        
-                        this.x -= directionX;
-                        this.y -= directionY;
+                // Mouse push effect
+                if (mouse.x !== null) {
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < mouse.radius) {
+                        const force = (mouse.radius - dist) / mouse.radius;
+                        this.x -= (dx / dist) * force * 0.5;
+                        this.y -= (dy / dist) * force * 0.5;
                     }
                 }
             }
+
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -122,52 +133,65 @@ document.addEventListener("DOMContentLoaded", () => {
         const initParticles = () => {
             resize();
             particles = [];
-            // Responsive particle count
-            const count = window.innerWidth < 900 ? 50 : 100; 
-            for (let i = 0; i < count; i++) particles.push(new Particle());
+            const count = window.innerWidth < 900 ? 50 : 100;
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
         };
 
         const animateParticles = () => {
             ctx.clearRect(0, 0, width, height);
-            
+
             for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
+                const p = particles[i];
                 p.update();
                 p.draw();
 
-                // Connect to Mouse/Finger
-                if (mouse.x != null) {
-                    let dx = p.x - mouse.x;
-                    let dy = p.y - mouse.y;
-                    let distance = Math.sqrt(dx*dx + dy*dy);
+                // --- Mouse connection lines ---
+                if (mouse.x !== null) {
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (distance < 150) {
+                    if (dist < 150) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.9 * (1 - distance/150)})`;
-                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.8 * (1 - dist / 150)})`;
+                        ctx.lineWidth = 1.2;
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(mouse.x, mouse.y);
                         ctx.stroke();
                     }
                 }
 
-                // Connect to other particles
-                for (let j = i; j < particles.length; j++) {
-                    let p2 = particles[j];
-                    let dx = p.x - p2.x;
-                    let dy = p.y - p2.y;
-                    let distance = Math.sqrt(dx*dx + dy*dy);
+                // --- Particle-to-particle mesh (ENHANCED) ---
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (distance < 100) {
+                    if (dist < 100) {
+                        let mouseBoost = 1;
+                        if (mouse.x !== null) {
+                            const mdx = p.x - mouse.x;
+                            const mdy = p.y - mouse.y;
+                            const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+                            if (mDist < 200) mouseBoost = 1.8;
+                        }
+
+                        const speed = Math.abs(p.vx) + Math.abs(p.vy);
+                        const opacity = 0.45 * mouseBoost * (1 - dist / 100);
+
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(93, 95, 239, ${0.6 * (1 - distance/100)})`;
-                        ctx.lineWidth = 0.5;
+                        ctx.strokeStyle = `rgba(93, 95, 239, ${opacity})`;
+                        ctx.lineWidth = 0.6 + speed * 1.5;
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(p2.x, p2.y);
                         ctx.stroke();
                     }
                 }
             }
+
             requestAnimationFrame(animateParticles);
         };
 
@@ -178,17 +202,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- 5. PAGE TRANSITION ENGINE ---
     document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             const target = this.getAttribute('href');
-            
-            if (!target || target.startsWith('#') || this.target === '_blank' || 
-                this.hasAttribute('download') || this.classList.contains('no-transition')) {
+
+            if (!target || target.startsWith('#') ||
+                this.target === '_blank' ||
+                this.hasAttribute('download') ||
+                this.classList.contains('no-transition')) {
                 return;
             }
 
             e.preventDefault();
             const curtain = document.querySelector('.page-transition');
-            
+
             if (curtain) {
                 curtain.style.transformOrigin = 'bottom';
                 curtain.style.transform = 'scaleY(1)';
@@ -201,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    window.addEventListener('pageshow', (event) => {
+    window.addEventListener('pageshow', () => {
         const curtain = document.querySelector('.page-transition');
         if (curtain) {
             setTimeout(() => {
@@ -211,21 +237,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // HOLOGRAPHIC CARD EFFECT
+    // --- 6. HOLOGRAPHIC CARD EFFECT ---
     const cards = document.querySelectorAll(".glass-card, .holo-card");
-    if(cards.length > 0) {
+    if (cards.length > 0) {
         document.addEventListener("mousemove", e => {
-            for(const card of cards) {
+            for (const card of cards) {
                 const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.setProperty("--mouse-x", `${x}px`);
-                card.style.setProperty("--mouse-y", `${y}px`);
+                card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+                card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
             }
         });
     }
 
 });
-
-
-
