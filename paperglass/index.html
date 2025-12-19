@@ -1,1 +1,192 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PaperGlass Pro | GravitonX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Icon points to root folder -->
+    <link rel="icon" href="../paperglassicon.png"> 
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+
+    <!-- Main Style from Root -->
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        /* PAGE SPECIFIC OVERRIDES */
+        .cursor-dot, .cursor-outline { z-index: 999999 !important; }
+        #download-overlay { cursor: default !important; }
+        .typing-text { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: bold; font-size: 1.5rem; }
+        
+        @media (max-width: 900px) {
+            .fg-hero { flex-direction: column !important; text-align: center; gap: 30px !important; }
+            .fg-hero h1 { font-size: 2.8rem !important; }
+            .typing-container { justify-content: center !important; }
+            .grid-3 { grid-template-columns: 1fr !important; padding: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay"></div>
+    <div class="page-transition"></div>
+    <div class="cursor-dot"></div> <div class="cursor-outline"></div> 
+    <canvas id="neural-canvas"></canvas>
+
+    <nav>
+        <a href="../index.html" class="logo"><img src="../gravitonx.png"> PaperGlass Pro</a>
+        <div class="nav-links">
+            <a href="../index.html"> < Back to Labs</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="section fg-hero" style="display:flex; align-items:center; gap:50px; min-height: 90vh;">
+        <div style="flex:1;" data-aos="fade-right">
+            <h1 style="font-size:4rem; line-height:1;">Document <span class="text-grad">Forge.</span></h1>
+            
+            <div class="typing-container" style="justify-content: flex-start; margin-top: 15px; display:flex; align-items:center;">
+                <span id="pg-typewriter" class="typing-text"></span>
+            </div>
+
+            <p style="color:#ccc; font-size:1.2rem; margin-bottom: 30px; margin-top: 15px;">
+                The ultimate PDF utility. Flatten documents, view with <b>Acrylic Blur</b>, and experience enterprise-grade speed.
+            </p>
+
+            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                <!-- APP DOWNLOAD -->
+                <button onclick="startDownloadFlow()" id="dl-btn-real" class="btn-glow no-transition">
+                    <i class="fa-brands fa-windows"></i> Download v2.0
+                </button>
+            </div>
+            <p style="margin-top:10px; color:#666; font-size:0.8rem;">* No Admin Rights Required</p>
+        </div>
+        
+        <div style="flex:1;" data-aos="zoom-in">
+            <!-- Ensure paperglass_dashboard.png exists in root or update path -->
+            <img src="../paperglass_dashboard.png" style="width:100%; border-radius:20px; border:1px solid rgba(255,255,255,0.2); box-shadow:0 30px 80px rgba(0, 240, 255, 0.3);" data-tilt>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" style="padding-top:0;">
+        <h2 style="text-align:center; margin-bottom:50px; font-size:2.5rem;" data-aos="fade-up">Core Capabilities</h2>
+        <div class="grid-3">
+             <div class="glass-card" data-aos="fade-up">
+                 <i class="fa-solid fa-layer-group" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i>
+                 <h3>PDF Flattening</h3><p>Convert editable PDFs into secure, flattened images instantly.</p>
+            </div>
+             <div class="glass-card" data-aos="fade-up" data-aos-delay="100">
+                 <i class="fa-solid fa-book-open" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i>
+                 <h3>Glass Reader</h3><p>A beautiful, translucent PDF reader with continuous scrolling.</p>
+            </div>
+             <div class="glass-card" data-aos="fade-up" data-aos-delay="200">
+                 <i class="fa-solid fa-wand-magic-sparkles" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i>
+                 <h3>Acrylic UI</h3><p>Built on Windows DWM API for real-time background blur.</p>
+            </div>
+             <div class="glass-card" data-aos="fade-up" data-aos-delay="300">
+                 <i class="fa-solid fa-bolt" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i>
+                 <h3>Zero Lag</h3><p>Multi-threaded processing ensures the UI never freezes.</p>
+            </div>
+             <div class="glass-card" data-aos="fade-up" data-aos-delay="400">
+                 <i class="fa-solid fa-expand" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i>
+                 <h3>Focus Mode</h3><p>Fullscreen reading mode for distraction-free study.</p>
+            </div>
+             <div class="glass-card" data-aos="fade-up" data-aos-delay="500">
+                 <i class="fa-solid fa-lock" style="font-size:2rem; color:var(--accent); margin-bottom:15px;"></i>
+                 <h3>Secure Core</h3><p>Local processing only. No data ever leaves your machine.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOWNLOAD OVERLAY -->
+    <div id="download-overlay">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="success-card">
+            <div class="icon-wrapper">
+                <div class="ripple"></div><div class="ripple"></div>
+                <div class="success-circle"><i class="fa-solid fa-bolt"></i></div>
+            </div>
+            <h2 style="font-size:2rem; margin-bottom:10px;">Forge <span class="text-grad">Initiated.</span></h2>
+            <p style="color:#aaa; margin-bottom:30px;">Your download of PaperGlass Pro v2.0 has started.<br>Experience true clarity.</p>
+            <div style="display:flex; gap:15px; justify-content:center;">
+                <button onclick="closeDownloadOverlay()" class="btn-glow" style="padding:10px 25px;">Back to Page</button>
+                <a href="../index.html" class="btn-glow no-transition" style="background:transparent; border:1px solid #333; box-shadow:none; text-decoration:none;">Home</a>
+            </div>
+            <p style="margin-top:20px; font-size:0.8rem; color:#666;">Download didn't start? <a href="#" id="retry-link" style="color:var(--accent);">Click here</a></p>
+        </div>
+    </div>
+
+    <footer style="text-align:center; padding:50px; border-top:1px solid var(--border); color:#666;">
+        <p>Powered by <b>GravitonX Framework</b></p>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+    <script src="../script.js"></script>
+    
+    <script>
+        VanillaTilt.init(document.querySelector("img[data-tilt]"), { max: 15, speed: 400 });
+
+        // --- FETCH PAPERGLASS REPO URL ---
+        let downloadUrl = "";
+        // ⚠️ REPLACE WITH YOUR PAPERGLASS REPO URL IF DIFFERENT
+        fetch('https://api.github.com/repos/MustafijRatul/PaperGlassRepo/releases/latest')
+            .then(res => res.json())
+            .then(data => {
+                const asset = data.assets.find(a => a.name.endsWith('.exe'));
+                if(asset) {
+                    downloadUrl = asset.browser_download_url;
+                    document.getElementById('retry-link').href = downloadUrl;
+                }
+            });
+
+        function startDownloadFlow() {
+            if(!downloadUrl) { alert("Fetching latest version... please wait."); return; }
+            const link = document.createElement('a'); 
+            link.href = downloadUrl; 
+            link.setAttribute('download', '');
+            document.body.appendChild(link); 
+            link.click(); 
+            document.body.removeChild(link);
+            const overlay = document.getElementById('download-overlay'); 
+            overlay.classList.add('active');
+            initConfetti();
+        }
+
+        function closeDownloadOverlay() { 
+            document.getElementById('download-overlay').classList.remove('active'); 
+        }
+
+        function initConfetti() {
+            const canvas = document.getElementById('confetti-canvas'); 
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            let confetti = []; const colors = ['#00F0FF', '#FFBC2E', '#5D5FEF', '#ffffff'];
+            for (let i = 0; i < 150; i++) {
+                confetti.push({ x: canvas.width/2, y: canvas.height/2, w: Math.random()*8+4, h: Math.random()*8+4, color: colors[Math.floor(Math.random()*colors.length)], vx: (Math.random()-0.5)*20, vy: (Math.random()-0.5)*20, gravity: 0.15, rotation: Math.random()*360, rotationSpeed: (Math.random()-0.5)*0.2 });
+            }
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); let active = false;
+                confetti.forEach((c, i) => {
+                    c.x += c.vx; c.y += c.vy; c.vy += c.gravity; c.rotation += c.rotationSpeed; c.w *= 0.96; c.h *= 0.96;
+                    ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.rotation); ctx.fillStyle = c.color; ctx.fillRect(-c.w/2, -c.h/2, c.w, c.h); ctx.restore();
+                    if(c.w > 0.2 && c.y < canvas.height) active = true;
+                });
+                if(active && document.getElementById('download-overlay').classList.contains('active')) requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // --- SPECIFIC TYPEWRITER FOR PAPERGLASS ---
+        new Typed('#pg-typewriter', {
+            strings: ['Secure PDF Flattening.', 'Glass-Morphic Reader.', 'High-DPI Rendering.', 'Distraction-Free UI.'],
+            typeSpeed: 60, backSpeed: 40, backDelay: 1500, loop: true, showCursor: false
+        });
+    </script>
+</body>
+</html>
